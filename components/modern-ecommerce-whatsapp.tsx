@@ -35,19 +35,19 @@ const featuredProducts: Product[] = [
     id: 1,
     name: "Premium Headphones",
     price: 199.99,
-    image: "https://i.postimg.cc/1zC9sqrG/2148205486.jpg",
+    image: "/1zC9sqrG/2148205486.jpg",
   },
   {
     id: 2,
     name: "Smartwatch Pro",
     price: 299.99,
-    image: "https://i.postimg.cc/Wz6pRfW3/2149436737.jpg",
+    image: "/Wz6pRfW3/2149436737.jpg",
   },
   {
     id: 3,
     name: "Wireless Earbuds",
     price: 149.99,
-    image: "https://i.postimg.cc/YqRn0fTm/13446.jpg",
+    image: "/YqRn0fTm/13446.jpg",
   },
 ];
 
