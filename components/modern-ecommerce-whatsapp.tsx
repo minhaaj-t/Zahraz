@@ -56,39 +56,39 @@ const products: Product[] = [
     id: 4,
     name: "IPHONE 16 Pro Max",
     price: 5099.0,
-    image: "https://i.postimg.cc/FRtqQFJr/6208003-3207184.jpg",
+    image: "/FRtqQFJr/6208003-3207184.jpg",
   },
   {
     id: 5,
     name: "Portable Charger",
     price: 49.99,
     image:
-      "https://i.postimg.cc/13r2Z1rw/32540410-m011t0410-b-wifi-extender-10aug22.jpg",
+      "/13r2Z1rw/32540410-m011t0410-b-wifi-extender-10aug22.jpg",
   },
   {
     id: 6,
     name: "Bluetooth Speaker",
     price: 79.99,
     image:
-      "https://i.postimg.cc/wvsxTBv7/32555155-m028t0128-a-speaker-12aug22.jpg",
+      "/wvsxTBv7/32555155-m028t0128-a-speaker-12aug22.jpg",
   },
   {
     id: 7,
     name: "Fitness Tracker",
     price: 89.99,
-    image: "https://i.postimg.cc/9FDbX5Ps/7744142-3732605.jpg",
+    image: "/9FDbX5Ps/7744142-3732605.jpg",
   },
   {
     id: 8,
     name: "Wireless Mouse",
     price: 29.99,
-    image: "https://i.postimg.cc/KcHCxy3g/2147916467.jpg",
+    image: "/KcHCxy3g/2147916467.jpg",
   },
   {
     id: 9,
     name: "USB-C Hub",
     price: 59.99,
-    image: "https://i.postimg.cc/7Yp6Ccd5/6123978-22838.jpg",
+    image: "/7Yp6Ccd5/6123978-22838.jpg",
   },
 ];
 
