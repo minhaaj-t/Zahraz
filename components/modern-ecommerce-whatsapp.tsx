@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import Image from 'next/image';
 import {
   Carousel,
   CarouselContent,
@@ -63,15 +62,13 @@ const products: Product[] = [
     id: 5,
     name: "Portable Charger",
     price: 49.99,
-    image:
-      "/13r2Z1rw/32540410-m011t0410-b-wifi-extender-10aug22.jpg",
+    image: "/13r2Z1rw/32540410-m011t0410-b-wifi-extender-10aug22.jpg",
   },
   {
     id: 6,
     name: "Bluetooth Speaker",
     price: 79.99,
-    image:
-      "/wvsxTBv7/32555155-m028t0128-a-speaker-12aug22.jpg",
+    image: "/wvsxTBv7/32555155-m028t0128-a-speaker-12aug22.jpg",
   },
   {
     id: 7,
@@ -125,14 +122,13 @@ export function ModernEcommerceWhatsapp() {
   return (
     <div className="container mx-auto px-4 py-8">
       <header className="flex justify-between items-center mb-8 shadow-lg p-4 bg-white sticky top-0 z-10">
-        {/* Logo */}
         <img
           src="https://i.postimg.cc/Gt6Xnd2P/Gold-and-Black-Minimalist-Monogram-Personal-Logo-20241107-185515-0000.png"
           alt="ZAHRAZ Logo"
           className="h-12"
         />
 
-        <h1 className="text-3xl font-bold text-gray-800">ZAHRA'Z</h1>
+        <h1 className="text-3xl font-bold text-gray-800">ZAHRA&apos;Z</h1>
 
         <Sheet>
           <SheetTrigger asChild>
@@ -258,28 +254,23 @@ export function ModernEcommerceWhatsapp() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <Card className="overflow-hidden">
-                <CardContent className="p-0">
+              <Card className="hover:shadow-lg transition-shadow">
+                <CardContent className="p-4">
                   <img
                     src={product.image}
                     alt={product.name}
-                    className="w-full h-48 object-cover"
+                    className="w-full h-48 object-cover rounded-lg"
                   />
-                  <div className="p-4">
-                    <h3 className="text-lg font-semibold mb-2">
-                      {product.name}
-                    </h3>
-                    <p className="text-gray-600 mb-4">
-                      AED{product.price.toFixed(2)}
-                    </p>
-                    <div className="flex justify-between items-center">
-                      <Button onClick={() => addToCart(product)} size="sm">
-                        Add to Cart
-                      </Button>
-                      <Button variant="ghost" size="icon">
-                        <Heart className="h-5 w-5" />
-                      </Button>
-                    </div>
+                  <div className="mt-4">
+                    <h3 className="text-lg font-semibold">{product.name}</h3>
+                    <p className="text-gray-500">AED{product.price.toFixed(2)}</p>
+                    <Button
+                      variant="outline"
+                      className="w-full mt-2"
+                      onClick={() => addToCart(product)}
+                    >
+                      <Heart className="mr-2 h-4 w-4" /> Add to Cart
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
