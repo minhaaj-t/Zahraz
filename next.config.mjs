@@ -1,8 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['i.postimg.cc'], // Add the domain of the external images
+    domains: ['i.postimg.cc'], // Add any additional domains as needed
   },
+  reactStrictMode: true,
 };
 
-export default nextConfig;
+module.exports = nextConfig;
