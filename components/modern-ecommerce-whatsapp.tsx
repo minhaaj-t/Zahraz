@@ -30,6 +30,7 @@ interface Product {
   image: string;
 }
 
+// Featured Products Array
 const featuredProducts: Product[] = [
   {
     id: 1,
@@ -51,6 +52,7 @@ const featuredProducts: Product[] = [
   },
 ];
 
+// Full Product List Array
 const products: Product[] = [
   {
     id: 4,
@@ -95,14 +97,17 @@ export function ModernEcommerceWhatsapp() {
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
 
+  // Add product to cart
   const addToCart = (product: Product) => {
     setCartItems([...cartItems, product]);
   };
 
+  // Remove product from cart
   const removeFromCart = (productId: number) => {
     setCartItems(cartItems.filter((item) => item.id !== productId));
   };
 
+  // Send cart details to WhatsApp
   const sendToWhatsApp = () => {
     const phoneNumber = "971528485234";
     let message = `Your Name: ${name}%0A`;
@@ -127,9 +132,7 @@ export function ModernEcommerceWhatsapp() {
           alt="ZAHRAZ Logo"
           className="h-12"
         />
-
         <h1 className="text-3xl font-bold text-gray-800">ZAHRA&apos;Z</h1>
-
         <Sheet>
           <SheetTrigger asChild>
             <Button variant="outline" size="icon" className="relative">
@@ -248,33 +251,23 @@ export function ModernEcommerceWhatsapp() {
         <h2 className="text-2xl font-semibold mb-4">All Products</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {products.map((product) => (
-            <motion.div
-              key={product.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <Card className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-4">
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="w-full h-48 object-cover rounded-lg"
-                  />
-                  <div className="mt-4">
-                    <h3 className="text-lg font-semibold">{product.name}</h3>
-                    <p className="text-gray-500">AED{product.price.toFixed(2)}</p>
-                    <Button
-                      variant="outline"
-                      className="w-full mt-2"
-                      onClick={() => addToCart(product)}
-                    >
-                      <Heart className="mr-2 h-4 w-4" /> Add to Cart
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
+            <Card key={product.id}>
+              <CardContent>
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  className="w-full h-auto object-cover rounded-lg mb-4"
+                />
+                <h3 className="text-lg font-semibold">{product.name}</h3>
+                <p className="text-gray-500">AED{product.price.toFixed(2)}</p>
+                <Button
+                  onClick={() => addToCart(product)}
+                  className="mt-2 w-full"
+                >
+                  Add to Cart
+                </Button>
+              </CardContent>
+            </Card>
           ))}
         </div>
       </section>
