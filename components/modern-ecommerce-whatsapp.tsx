@@ -251,22 +251,26 @@ export function ModernEcommerceWhatsapp() {
         <h2 className="text-2xl font-semibold mb-4">All Products</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {products.map((product) => (
-            <Card key={product.id}>
-              <CardContent>
+            <Card key={product.id} className="p-4">
+              <div className="relative w-full">
                 <img
                   src={product.image}
                   alt={product.name}
-                  className="w-full h-auto object-cover rounded-lg mb-4"
+                  className="w-full h-auto object-cover rounded-lg"
                 />
-                <h3 className="text-lg font-semibold">{product.name}</h3>
-                <p className="text-gray-500">AED{product.price.toFixed(2)}</p>
-                <Button
-                  onClick={() => addToCart(product)}
-                  className="mt-2 w-full"
-                >
-                  Add to Cart
-                </Button>
-              </CardContent>
+                <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-4">
+                  <h3 className="text-xl font-semibold">{product.name}</h3>
+                  <p className="text-lg">
+                    AED{product.price.toFixed(2)}
+                  </p>
+                  <Button
+                    onClick={() => addToCart(product)}
+                    className="mt-2"
+                  >
+                    Add to Cart
+                  </Button>
+                </div>
+              </div>
             </Card>
           ))}
         </div>
