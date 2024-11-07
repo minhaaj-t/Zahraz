@@ -6,4 +6,5 @@ const nextConfig = {
   reactStrictMode: true,
 };
 
+// Export the configuration using CommonJS syntax
 module.exports = nextConfig;
