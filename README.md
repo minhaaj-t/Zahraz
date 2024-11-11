@@ -8,7 +8,8 @@ Welcome to **Zuhraz Shopping Web App** — a modern, user-friendly e-commerce pl
 </div>
 <div align="center">
   <h3>Watch the Demo Video</h3>
-</div>
+</div> 
+
 
 
 ## Table of Contents
