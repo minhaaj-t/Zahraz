@@ -1,5 +1,5 @@
 # Zuhraz Shopping Web App
-
+ 
 Welcome to **Zuhraz Shopping Web App** — a modern, user-friendly e-commerce platform designed for a seamless shopping experience. This app enables users to browse, search, and purchase products with ease, making it ideal for retail businesses looking to expand their online presence.
 
 <div align="center">
