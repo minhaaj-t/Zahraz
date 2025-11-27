@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   Package,
   ShoppingCart,
+  Users,
   BarChart3,
   Settings,
   LogOut,
@@ -16,36 +17,22 @@ import {
   Search,
   TrendingUp,
   DollarSign,
+  ShoppingBag,
+  Eye,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { type Product } from "@/lib/products";
-import { fetchProducts, fetchOrders, fetchStats, createProduct, updateProduct, deleteProduct } from "@/lib/api";
+import { fetchProducts, fetchOrders, fetchStats, createProduct, updateProduct, deleteProduct, adminLogin } from "@/lib/api";
 import { ImageUpload } from "@/components/image-upload";
 
 export function AdminDashboard() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("dashboard");
   const [products, setProducts] = useState<Product[]>([]);
-  interface Order {
-    id?: number;
-    customerName?: string;
-    address?: string;
-    items?: Array<{ name: string; quantity: number; price: number }>;
-    total?: number;
-    status?: string;
-  }
-  
-  interface Stats {
-    totalProducts: number;
-    totalOrders: number;
-    totalRevenue: number;
-    inStockProducts: number;
-  }
-
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [stats, setStats] = useState<Stats | null>(null);
+  const [orders, setOrders] = useState<any[]>([]);
+  const [stats, setStats] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [showProductForm, setShowProductForm] = useState(false);
@@ -437,7 +424,7 @@ export function AdminDashboard() {
                         </div>
                         <div className="border-t border-gray-600 pt-3">
                           <p className="text-sm font-semibold mb-2">Items:</p>
-                          {order.items?.map((item: { name: string; quantity: number; price: number }, idx: number) => (
+                          {order.items?.map((item: any, idx: number) => (
                             <div
                               key={idx}
                               className="flex justify-between text-sm text-gray-300"
@@ -535,7 +522,6 @@ export function AdminDashboard() {
                   <Input
                     defaultValue="ZAHRA'Z Collections"
                     className="bg-gray-700 border-gray-600 text-white"
-                    placeholder="Store Name"
                   />
                 </div>
                 <div>
@@ -546,7 +532,6 @@ export function AdminDashboard() {
                     type="email"
                     defaultValue="admin@zahraz.com"
                     className="bg-gray-700 border-gray-600 text-white"
-                    placeholder="Store Email"
                   />
                 </div>
                 <div>
@@ -556,7 +541,6 @@ export function AdminDashboard() {
                   <Input
                     defaultValue="+971528485234"
                     className="bg-gray-700 border-gray-600 text-white"
-                    placeholder="WhatsApp Number"
                   />
                 </div>
                 <Button className="bg-blue-600 hover:bg-blue-700">
@@ -629,7 +613,6 @@ function ProductFormModal({
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               className="bg-gray-700 border-gray-600 text-white"
-              placeholder="Product Name"
               required
             />
           </div>
@@ -646,7 +629,6 @@ function ProductFormModal({
                   setFormData({ ...formData, price: parseFloat(e.target.value) })
                 }
                 className="bg-gray-700 border-gray-600 text-white"
-                placeholder="0.00"
                 required
               />
             </div>
@@ -660,7 +642,6 @@ function ProductFormModal({
                   setFormData({ ...formData, category: e.target.value })
                 }
                 className="bg-gray-700 border-gray-600 text-white"
-                placeholder="Category"
               />
             </div>
           </div>

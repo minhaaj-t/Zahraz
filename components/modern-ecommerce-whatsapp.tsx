@@ -537,14 +537,9 @@ export function ModernEcommerceWhatsapp() {
           </h2>
           <p className="text-sm sm:text-base text-gray-600">Handpicked selections just for you</p>
         </motion.div>
-        {loading ? (
-          <div className="text-center py-12">
-            <p className="text-gray-500">Loading products...</p>
-          </div>
-        ) : (
-          <Carousel className="w-full max-w-7xl mx-auto">
-            <CarouselContent className="-ml-2 md:-ml-4">
-              {featuredProducts.map((product, index) => (
+        <Carousel className="w-full max-w-7xl mx-auto">
+          <CarouselContent className="-ml-2 md:-ml-4">
+            {featuredProducts.map((product, index) => (
               <CarouselItem key={product.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
@@ -618,8 +613,8 @@ export function ModernEcommerceWhatsapp() {
                   </Card>
                 </motion.div>
               </CarouselItem>
-              ))}
-            </CarouselContent>
+            ))}
+          </CarouselContent>
             <CarouselPrevious className="left-2 sm:left-4 h-8 w-8 sm:h-10 sm:w-10" />
             <CarouselNext className="right-2 sm:right-4 h-8 w-8 sm:h-10 sm:w-10" />
           </Carousel>
