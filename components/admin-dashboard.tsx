@@ -522,6 +522,7 @@ export function AdminDashboard() {
                   <Input
                     defaultValue="ZAHRA'Z Collections"
                     className="bg-gray-700 border-gray-600 text-white"
+                    placeholder="Store Name"
                   />
                 </div>
                 <div>
@@ -532,6 +533,7 @@ export function AdminDashboard() {
                     type="email"
                     defaultValue="admin@zahraz.com"
                     className="bg-gray-700 border-gray-600 text-white"
+                    placeholder="Store Email"
                   />
                 </div>
                 <div>
@@ -541,6 +543,7 @@ export function AdminDashboard() {
                   <Input
                     defaultValue="+971528485234"
                     className="bg-gray-700 border-gray-600 text-white"
+                    placeholder="WhatsApp Number"
                   />
                 </div>
                 <Button className="bg-blue-600 hover:bg-blue-700">
@@ -613,6 +616,7 @@ function ProductFormModal({
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               className="bg-gray-700 border-gray-600 text-white"
+              placeholder="Product Name"
               required
             />
           </div>
@@ -629,6 +633,7 @@ function ProductFormModal({
                   setFormData({ ...formData, price: parseFloat(e.target.value) })
                 }
                 className="bg-gray-700 border-gray-600 text-white"
+                placeholder="0.00"
                 required
               />
             </div>
@@ -642,6 +647,7 @@ function ProductFormModal({
                   setFormData({ ...formData, category: e.target.value })
                 }
                 className="bg-gray-700 border-gray-600 text-white"
+                placeholder="Category"
               />
             </div>
           </div>
