@@ -48,10 +48,22 @@ async function initializeDatabase() {
 }
 
 // Vercel serverless function handler
+let handler;
+
+async function getHandler() {
+  if (!handler) {
+    await initializeDatabase();
+    handler = app;
+  }
+  return handler;
+}
+
 module.exports = async (req, res) => {
-  // Initialize database on first request
-  await initializeDatabase();
-  
-  // Handle the request
-  return app(req, res);
+  try {
+    const appHandler = await getHandler();
+    return appHandler(req, res);
+  } catch (error) {
+    console.error('Handler error:', error);
+    res.status(500).json({ success: false, error: 'Internal server error' });
+  }
 };
