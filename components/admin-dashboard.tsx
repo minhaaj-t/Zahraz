@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
@@ -457,20 +458,23 @@ export function AdminDashboard() {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 {filteredProducts.map((product) => (
-                <Card key={product.id} className="bg-gray-800 border-gray-700">
+                <Card key={product.id} className="bg-gray-900/60 border border-gray-800 shadow-lg">
                   <div className="relative aspect-square overflow-hidden rounded-t-lg">
-                    <img
-                      src={product.image}
+                    <Image
+                      src={product.image || "/placeholder.png"}
                       alt={product.name}
-                      className="w-full h-full object-cover"
+                      fill
+                      sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw"
+                      className="object-cover"
+                      unoptimized
                     />
                   </div>
-                  <CardContent className="p-4">
-                    <h3 className="font-bold text-lg mb-2">{product.name}</h3>
-                    <p className="text-gray-400 text-sm mb-2 line-clamp-2">
+                  <CardContent className="p-4 space-y-3">
+                    <h3 className="font-bold text-lg">{product.name}</h3>
+                    <p className="text-gray-400 text-sm line-clamp-2">
                       {product.description}
                     </p>
-                    <p className="text-xl font-bold text-blue-400 mb-4">
+                    <p className="text-xl font-bold text-blue-400">
                       AED {Number(product.price).toFixed(2)}
                     </p>
                     <div className="flex gap-2">
@@ -478,7 +482,7 @@ export function AdminDashboard() {
                         size="sm"
                         variant="outline"
                         onClick={() => handleEditProduct(product)}
-                        className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-700"
+                        className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-800"
                       >
                         <Edit className="mr-2 h-4 w-4" />
                         Edit
@@ -547,10 +551,13 @@ export function AdminDashboard() {
                         className="bg-gray-800/70 border border-gray-700 rounded-xl overflow-hidden flex flex-col shadow-lg"
                       >
                         <div className="relative h-48">
-                          <img
-                            src={banner.image}
+                          <Image
+                            src={banner.image || "/placeholder.png"}
                             alt={banner.title}
-                            className="w-full h-full object-cover"
+                            fill
+                            sizes="(min-width: 1024px) 45vw, 90vw"
+                            className="object-cover"
+                            unoptimized
                           />
                           <span className="absolute top-3 left-3 bg-black/60 text-xs px-3 py-1 rounded-full">
                             Order #{banner.orderIndex ?? 0}

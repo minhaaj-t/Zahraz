@@ -373,7 +373,7 @@ export function ModernEcommerceWhatsapp() {
               animate={{ opacity: 1, x: 0 }}
               className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1"
             >
-              <Image
+                    <Image
                 src={zahrazLogo}
                 alt="ZAHRA'Z Boutique Logo"
                 className="h-10 w-10 sm:h-12 sm:w-12 object-contain flex-shrink-0 drop-shadow-lg"
@@ -428,11 +428,16 @@ export function ModernEcommerceWhatsapp() {
                         exit={{ opacity: 0, x: -100 }}
                         className="flex gap-2 sm:gap-4 p-3 sm:p-4 bg-gray-50 rounded-lg border border-gray-200 hover:shadow-md transition-shadow"
                       >
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg flex-shrink-0"
-                        />
+                        <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0">
+                          <Image
+                            src={item.image || "/placeholder.png"}
+                            alt={item.name}
+                            fill
+                            sizes="80px"
+                            className="object-cover rounded-lg"
+                            unoptimized
+                          />
+                        </div>
                         <div className="flex-1 min-w-0">
                           <h3 className="font-semibold text-xs sm:text-sm mb-1 truncate">{item.name}</h3>
                           <p className="text-xs sm:text-sm font-bold text-gray-900 mb-2">
@@ -535,10 +540,14 @@ export function ModernEcommerceWhatsapp() {
                     transition={{ duration: 0.8 }}
                     className="absolute inset-0"
                   >
-                    <img
-                      src={banner.image}
+                    <Image
+                      src={banner.image || "/placeholder.png"}
                       alt={banner.title}
-                      className="w-full h-full object-cover"
+                      fill
+                      sizes="100vw"
+                      className="object-cover"
+                      priority={banner.orderIndex === 0}
+                      unoptimized
                     />
                     <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/55 to-transparent" />
                   </motion.div>

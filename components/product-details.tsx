@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
@@ -106,10 +107,13 @@ export function ProductDetails({ product, relatedProducts = [] }: ProductDetails
               transition={{ duration: 0.3 }}
               className="relative aspect-square overflow-hidden rounded-xl sm:rounded-2xl bg-gray-100 border-2 border-gray-200"
             >
-              <img
-                src={images[selectedImageIndex]}
+              <Image
+                src={images[selectedImageIndex] || "/placeholder.png"}
                 alt={product.name}
-                className="w-full h-full object-cover"
+                fill
+                sizes="(min-width: 1024px) 40vw, 90vw"
+                className="object-cover"
+                unoptimized
               />
               <motion.button
                 whileHover={{ scale: 1.1 }}
@@ -159,10 +163,13 @@ export function ProductDetails({ product, relatedProducts = [] }: ProductDetails
                         : "border-gray-200 hover:border-gray-400"
                     }`}
                   >
-                    <img
-                      src={image}
+                    <Image
+                      src={image || "/placeholder.png"}
                       alt={`${product.name} view ${index + 1}`}
-                      className="w-full h-full object-cover"
+                      fill
+                      sizes="96px"
+                      className="object-cover"
+                      unoptimized
                     />
                   </motion.button>
                 ))}

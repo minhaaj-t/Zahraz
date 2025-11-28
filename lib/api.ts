@@ -1,6 +1,6 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://zahraz-server.vercel.app/api';
 
-async function parseJsonResponse<T = any>(response: Response): Promise<T> {
+async function parseJsonResponse<T = unknown>(response: Response): Promise<T> {
   const contentType = response.headers.get('content-type');
   if (!contentType || !contentType.includes('application/json')) {
     const text = await response.text();

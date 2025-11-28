@@ -5,6 +5,7 @@ const nextConfig = {
       'i.postimg.cc',
       'i.ibb.co', // ImgBB CDN
       'ibb.co', // ImgBB
+      'images.unsplash.com',
     ],
     remotePatterns: [
       {
@@ -14,6 +15,10 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: '**.imgbb.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
       },
     ],
   },

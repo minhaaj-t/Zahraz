@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState, useRef } from "react";
 import { Upload, X, Image as ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -142,11 +143,14 @@ export function MultiImageUpload({
       >
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {images.map((img, index) => (
-            <div key={index} className="relative group">
-              <img
+            <div key={index} className="relative group h-32">
+              <Image
                 src={img}
                 alt={`Gallery ${index + 1}`}
-                className="w-full h-32 object-cover rounded-lg border border-gray-600"
+                fill
+                sizes="(min-width: 1024px) 20vw, 40vw"
+                className="object-cover rounded-lg border border-gray-600"
+                unoptimized
               />
               <button
                 type="button"
