@@ -154,9 +154,10 @@ export function AdminDashboard() {
           alert(result.error || "Failed to create product");
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error saving product:", error);
-      alert("Failed to save product: " + (error.message || "Unknown error"));
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      alert("Failed to save product: " + errorMessage);
     }
   };
 
