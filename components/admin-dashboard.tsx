@@ -236,7 +236,7 @@ export function AdminDashboard() {
                   <Package className="h-8 w-8 text-blue-400" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold">{displayStats.totalProducts}</div>
+                  <div className="text-3xl font-bold">{displayStats.totalProducts || 0}</div>
                 </CardContent>
               </Card>
 
@@ -246,7 +246,7 @@ export function AdminDashboard() {
                   <ShoppingCart className="h-8 w-8 text-green-400" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold">{displayStats.totalOrders}</div>
+                  <div className="text-3xl font-bold">{displayStats.totalOrders || 0}</div>
                 </CardContent>
               </Card>
 
@@ -268,7 +268,7 @@ export function AdminDashboard() {
                   <TrendingUp className="h-8 w-8 text-purple-400" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold">{displayStats.inStockProducts}</div>
+                  <div className="text-3xl font-bold">{displayStats.inStockProducts || 0}</div>
                 </CardContent>
               </Card>
             </div>
@@ -471,14 +471,14 @@ export function AdminDashboard() {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-400">Total Orders</span>
-                      <span className="font-bold">{displayStats.totalOrders}</span>
+                      <span className="font-bold">{displayStats.totalOrders || 0}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-400">Average Order Value</span>
                       <span className="font-bold">
                         AED{" "}
-                        {displayStats.totalOrders > 0
-                          ? ((displayStats.totalRevenue || 0) / displayStats.totalOrders).toFixed(2)
+                        {(displayStats.totalOrders || 0) > 0
+                          ? ((displayStats.totalRevenue || 0) / (displayStats.totalOrders || 1)).toFixed(2)
                           : "0.00"}
                       </span>
                     </div>
@@ -494,18 +494,18 @@ export function AdminDashboard() {
                   <div className="space-y-4">
                     <div className="flex justify-between">
                       <span className="text-gray-400">Total Products</span>
-                      <span className="font-bold">{displayStats.totalProducts}</span>
+                      <span className="font-bold">{displayStats.totalProducts || 0}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-400">In Stock</span>
                       <span className="font-bold text-green-400">
-                        {displayStats.inStockProducts}
+                        {displayStats.inStockProducts || 0}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-400">Out of Stock</span>
                       <span className="font-bold text-red-400">
-                        {displayStats.totalProducts - displayStats.inStockProducts}
+                        {(displayStats.totalProducts || 0) - (displayStats.inStockProducts || 0)}
                       </span>
                     </div>
                   </div>
@@ -530,6 +530,7 @@ export function AdminDashboard() {
                   </label>
                   <Input
                     defaultValue="ZAHRA'Z Collections"
+                    placeholder="Store Name"
                     className="bg-gray-700 border-gray-600 text-white"
                   />
                 </div>
@@ -540,6 +541,7 @@ export function AdminDashboard() {
                   <Input
                     type="email"
                     defaultValue="admin@zahraz.com"
+                    placeholder="Store Email"
                     className="bg-gray-700 border-gray-600 text-white"
                   />
                 </div>
@@ -549,6 +551,7 @@ export function AdminDashboard() {
                   </label>
                   <Input
                     defaultValue="+971528485234"
+                    placeholder="WhatsApp Number"
                     className="bg-gray-700 border-gray-600 text-white"
                   />
                 </div>
@@ -621,6 +624,7 @@ function ProductFormModal({
             <Input
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              placeholder="Product Name"
               className="bg-gray-700 border-gray-600 text-white"
               required
             />
@@ -637,6 +641,7 @@ function ProductFormModal({
                 onChange={(e) =>
                   setFormData({ ...formData, price: parseFloat(e.target.value) })
                 }
+                placeholder="0.00"
                 className="bg-gray-700 border-gray-600 text-white"
                 required
               />
@@ -650,6 +655,7 @@ function ProductFormModal({
                 onChange={(e) =>
                   setFormData({ ...formData, category: e.target.value })
                 }
+                placeholder="Category"
                 className="bg-gray-700 border-gray-600 text-white"
               />
             </div>
