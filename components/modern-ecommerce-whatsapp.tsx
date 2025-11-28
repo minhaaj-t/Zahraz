@@ -512,7 +512,7 @@ export function ModernEcommerceWhatsapp() {
           setApi={setApi}
         >
           <CarouselContent className="-ml-0">
-            {banners.map((banner, index) => (
+            {banners.map((banner) => (
               <CarouselItem key={banner.id} className="pl-0">
                 <div className="relative w-full h-[400px] md:h-[500px] lg:h-[600px] overflow-hidden">
                   <motion.div
