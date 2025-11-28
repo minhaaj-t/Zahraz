@@ -1,5 +1,13 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://zahraz-server.vercel.app/api';
 
+export interface ApiResponse<T = unknown> {
+  success: boolean;
+  data?: T;
+  error?: string;
+  message?: string;
+  [key: string]: unknown;
+}
+
 async function parseJsonResponse<T = unknown>(response: Response): Promise<T> {
   const contentType = response.headers.get('content-type');
   if (!contentType || !contentType.includes('application/json')) {
@@ -110,7 +118,7 @@ export async function createProduct(productData: Partial<{
   rating: number;
   reviews: number;
   inStock: boolean;
-}>, token: string) {
+}>, token: string): Promise<ApiResponse> {
   const response = await fetch(`${API_BASE_URL}/products`, {
     method: 'POST',
     headers: {
@@ -119,7 +127,7 @@ export async function createProduct(productData: Partial<{
     },
     body: JSON.stringify(productData),
   });
-  return parseJsonResponse(response);
+  return parseJsonResponse<ApiResponse>(response);
 }
 
 export async function updateProduct(id: number, productData: Partial<{
@@ -132,7 +140,7 @@ export async function updateProduct(id: number, productData: Partial<{
   rating: number;
   reviews: number;
   inStock: boolean;
-}>, token: string) {
+}>, token: string): Promise<ApiResponse> {
   const response = await fetch(`${API_BASE_URL}/products/${id}`, {
     method: 'PUT',
     headers: {
@@ -141,7 +149,7 @@ export async function updateProduct(id: number, productData: Partial<{
     },
     body: JSON.stringify(productData),
   });
-  return parseJsonResponse(response);
+  return parseJsonResponse<ApiResponse>(response);
 }
 
 export async function deleteProduct(id: number, token: string) {
@@ -151,7 +159,7 @@ export async function deleteProduct(id: number, token: string) {
       'Authorization': `Bearer ${token}`,
     },
   });
-  return parseJsonResponse(response);
+  return parseJsonResponse<ApiResponse>(response);
 }
 
 export async function fetchBanners(): Promise<Banner[]> {
@@ -160,7 +168,7 @@ export async function fetchBanners(): Promise<Banner[]> {
   return data.success ? data.data : [];
 }
 
-export async function createBanner(bannerData: Partial<Banner>, token: string) {
+export async function createBanner(bannerData: Partial<Banner>, token: string): Promise<ApiResponse> {
   const response = await fetch(`${API_BASE_URL}/banners`, {
     method: 'POST',
     headers: {
@@ -169,10 +177,10 @@ export async function createBanner(bannerData: Partial<Banner>, token: string) {
     },
     body: JSON.stringify(bannerData),
   });
-  return parseJsonResponse(response);
+  return parseJsonResponse<ApiResponse>(response);
 }
 
-export async function updateBanner(id: number, bannerData: Partial<Banner>, token: string) {
+export async function updateBanner(id: number, bannerData: Partial<Banner>, token: string): Promise<ApiResponse> {
   const response = await fetch(`${API_BASE_URL}/banners/${id}`, {
     method: 'PUT',
     headers: {
@@ -181,7 +189,7 @@ export async function updateBanner(id: number, bannerData: Partial<Banner>, toke
     },
     body: JSON.stringify(bannerData),
   });
-  return parseJsonResponse(response);
+  return parseJsonResponse<ApiResponse>(response);
 }
 
 export async function deleteBanner(id: number, token: string) {
@@ -191,6 +199,6 @@ export async function deleteBanner(id: number, token: string) {
       'Authorization': `Bearer ${token}`,
     },
   });
-  return parseJsonResponse(response);
+  return parseJsonResponse<ApiResponse>(response);
 }
 

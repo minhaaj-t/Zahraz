@@ -26,6 +26,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { type Product } from "@/lib/products";
 import {
   type Banner,
+  type ApiResponse,
   fetchProducts,
   fetchOrders,
   fetchStats,
@@ -161,7 +162,7 @@ export function AdminDashboard() {
           setShowProductForm(false);
           setEditingProduct(null);
         } else {
-          alert(result.error || "Failed to update product");
+          alert(result.error || result.message || "Failed to update product");
         }
       } else {
         // Add new product
@@ -175,7 +176,7 @@ export function AdminDashboard() {
           setShowProductForm(false);
           setEditingProduct(null);
         } else {
-          alert(result.error || "Failed to create product");
+          alert(result.error || result.message || "Failed to create product");
         }
       }
     } catch (error: unknown) {
@@ -200,7 +201,7 @@ export function AdminDashboard() {
       if (editingBanner) {
         const result = await updateBanner(editingBanner.id, bannerData, token);
         if (!result.success) {
-          alert(result.error || "Failed to update banner");
+          alert(result.error || result.message || "Failed to update banner");
           return;
         }
       } else {
@@ -210,7 +211,7 @@ export function AdminDashboard() {
         }
         const result = await createBanner(bannerData, token);
         if (!result.success) {
-          alert(result.error || "Failed to create banner");
+          alert(result.error || result.message || "Failed to create banner");
           return;
         }
       }
