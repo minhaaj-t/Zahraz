@@ -1032,6 +1032,7 @@ function BannerFormModal({
                 onChange={(e) => setFormData({ ...formData, orderIndex: Number(e.target.value) })}
                 className="bg-gray-800 border-gray-700 text-white"
                 min={0}
+                placeholder="0"
               />
             </div>
           </div>
