@@ -94,7 +94,21 @@ export async function createProduct(productData: Partial<{
     },
     body: JSON.stringify(productData),
   });
+  
+  // Check if response is JSON
+  const contentType = response.headers.get('content-type');
+  if (!contentType || !contentType.includes('application/json')) {
+    const text = await response.text();
+    console.error('Non-JSON response:', text.substring(0, 200));
+    throw new Error(`Server returned ${response.status}: ${response.statusText}. Expected JSON but got ${contentType || 'unknown'}`);
+  }
+  
   const data = await response.json();
+  
+  if (!response.ok) {
+    throw new Error(data.error || data.message || `HTTP ${response.status}: ${response.statusText}`);
+  }
+  
   return data;
 }
 
@@ -117,7 +131,21 @@ export async function updateProduct(id: number, productData: Partial<{
     },
     body: JSON.stringify(productData),
   });
+  
+  // Check if response is JSON
+  const contentType = response.headers.get('content-type');
+  if (!contentType || !contentType.includes('application/json')) {
+    const text = await response.text();
+    console.error('Non-JSON response:', text.substring(0, 200));
+    throw new Error(`Server returned ${response.status}: ${response.statusText}. Expected JSON but got ${contentType || 'unknown'}`);
+  }
+  
   const data = await response.json();
+  
+  if (!response.ok) {
+    throw new Error(data.error || data.message || `HTTP ${response.status}: ${response.statusText}`);
+  }
+  
   return data;
 }
 
