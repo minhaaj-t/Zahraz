@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import NextImage from "next/image";
 import { useState, useRef } from "react";
 import { Upload, X, Image as ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -32,7 +32,7 @@ export function MultiImageUpload({
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = (e) => {
-        const img = new Image();
+        const img = new window.Image();
         img.onload = () => {
           const canvas = document.createElement("canvas");
           let width = img.width;
@@ -144,7 +144,7 @@ export function MultiImageUpload({
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {images.map((img, index) => (
             <div key={index} className="relative group h-32">
-              <Image
+              <NextImage
                 src={img}
                 alt={`Gallery ${index + 1}`}
                 fill
