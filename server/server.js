@@ -16,11 +16,13 @@ const productsRouter = require('./routes/products');
 const ordersRouter = require('./routes/orders');
 const authRouter = require('./routes/auth');
 const statsRouter = require('./routes/stats');
+const bannersRouter = require('./routes/banners');
 
 app.use('/api/products', productsRouter);
 app.use('/api/orders', ordersRouter);
 app.use('/api/auth', authRouter.router);
 app.use('/api/stats', statsRouter);
+app.use('/api/banners', bannersRouter);
 
 // Health check
 app.get('/api/health', (req, res) => {

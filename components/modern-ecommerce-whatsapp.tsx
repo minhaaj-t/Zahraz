@@ -28,7 +28,7 @@ import {
 } from "@/components/ui/sheet";
 
 import { type Product } from "@/lib/products";
-import { fetchProducts, fetchFeaturedProducts, createOrder } from "@/lib/api";
+import { type Banner, fetchProducts, fetchFeaturedProducts, fetchBanners, createOrder } from "@/lib/api";
 import zahrazLogo from "@/app/images/zahraz.png";
 
 const boutiqueFont = Playfair_Display({
@@ -37,17 +37,7 @@ const boutiqueFont = Playfair_Display({
   display: "swap",
 });
 
-// Banner Slider Data
-interface Banner {
-  id: number;
-  title: string;
-  subtitle: string;
-  image: string;
-  buttonText?: string;
-  buttonLink?: string;
-}
-
-const banners: Banner[] = [
+const defaultBanners: Banner[] = [
   {
     id: 1,
     title: "New Collection 2024",
@@ -82,6 +72,7 @@ export function ModernEcommerceWhatsapp() {
   const [api, setApi] = useState<CarouselApi>();
   const [products, setProducts] = useState<Product[]>([]);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [banners, setBanners] = useState<Banner[]>([]);
   const [loading, setLoading] = useState(true);
   const [flyingAirplane, setFlyingAirplane] = useState<{
     startX: number;
@@ -164,32 +155,37 @@ export function ModernEcommerceWhatsapp() {
     localStorage.setItem("favorites", JSON.stringify(newFavorites));
   };
 
-  // Load products from API
+  // Load storefront data from API
   useEffect(() => {
-    const loadProducts = async () => {
+    const loadData = async () => {
       try {
         setLoading(true);
-        const [allProducts, featured] = await Promise.all([
+        const [allProducts, featured, remoteBanners] = await Promise.all([
           fetchProducts(),
           fetchFeaturedProducts(),
+          fetchBanners(),
         ]);
-        // Ensure prices are numbers (MySQL returns DECIMAL as string)
         const normalizePrice = (product: Product) => ({
           ...product,
-          price: Number(product.price) || 0
+          price: Number(product.price) || 0,
         });
         setProducts(allProducts.map(normalizePrice));
         setFeaturedProducts(featured.map(normalizePrice));
+
+        const orderedBanners = (remoteBanners || [])
+          .filter((banner) => banner.isActive !== false)
+          .sort((a, b) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0));
+        setBanners(orderedBanners);
       } catch (error) {
-        console.error("Error loading products:", error);
-        // Fallback to empty arrays on error
+        console.error("Error loading storefront data:", error);
         setProducts([]);
         setFeaturedProducts([]);
+        setBanners([]);
       } finally {
         setLoading(false);
       }
     };
-    loadProducts();
+    loadData();
   }, []);
 
   // Filter products based on search
@@ -197,6 +193,8 @@ export function ModernEcommerceWhatsapp() {
   const filteredProducts = allProductsList.filter((product) =>
     product.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const heroBanners = banners.length ? banners : defaultBanners;
 
   // Track carousel slide changes
   useEffect(() => {
@@ -524,7 +522,7 @@ export function ModernEcommerceWhatsapp() {
           setApi={setApi}
         >
           <CarouselContent className="-ml-0">
-            {banners.map((banner) => (
+            {heroBanners.map((banner) => (
               <CarouselItem key={banner.id} className="pl-0">
                 <div className="relative w-full h-[400px] md:h-[500px] lg:h-[600px] overflow-hidden">
                   <motion.div
@@ -597,7 +595,7 @@ export function ModernEcommerceWhatsapp() {
         </Carousel>
         {/* Enhanced Dots indicator */}
         <div className="absolute bottom-4 sm:bottom-6 left-1/2 transform -translate-x-1/2 z-20 flex gap-2 sm:gap-3">
-          {banners.map((banner, index) => (
+          {heroBanners.map((banner, index) => (
             <motion.button
               key={banner.id}
               onClick={() => {

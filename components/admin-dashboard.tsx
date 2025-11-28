@@ -16,12 +16,26 @@ import {
   Search,
   TrendingUp,
   DollarSign,
+  Images,
+  Link2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { type Product } from "@/lib/products";
-import { fetchProducts, fetchOrders, fetchStats, createProduct, updateProduct, deleteProduct } from "@/lib/api";
+import {
+  type Banner,
+  fetchProducts,
+  fetchOrders,
+  fetchStats,
+  fetchBanners,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+  createBanner,
+  updateBanner,
+  deleteBanner,
+} from "@/lib/api";
 import { ImageUpload } from "@/components/image-upload";
 import { MultiImageUpload } from "@/components/multi-image-upload";
 
@@ -49,6 +63,9 @@ export function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState<string | null>(null);
+  const [banners, setBanners] = useState<Banner[]>([]);
+  const [editingBanner, setEditingBanner] = useState<Banner | null>(null);
+  const [showBannerForm, setShowBannerForm] = useState(false);
 
   useEffect(() => {
     // Check for existing token
@@ -65,14 +82,19 @@ export function AdminDashboard() {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [productsData, ordersData, statsData] = await Promise.all([
+      const [productsData, ordersData, statsData, bannersData] = await Promise.all([
         fetchProducts(),
         fetchOrders(),
         fetchStats(),
+        fetchBanners(),
       ]);
       setProducts(productsData);
       setOrders(ordersData);
       setStats(statsData);
+      const orderedBanners = (bannersData || []).sort(
+        (a, b) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0)
+      );
+      setBanners(orderedBanners);
     } catch (error) {
       console.error("Error loading data:", error);
     } finally {
@@ -162,6 +184,61 @@ export function AdminDashboard() {
     }
   };
 
+  const handleEditBanner = (banner: Banner) => {
+    setEditingBanner(banner);
+    setShowBannerForm(true);
+  };
+
+  const handleSaveBanner = async (bannerData: Partial<Banner>) => {
+    try {
+      if (!token) {
+        alert("Please login first");
+        return;
+      }
+
+      if (editingBanner) {
+        const result = await updateBanner(editingBanner.id, bannerData, token);
+        if (!result.success) {
+          alert(result.error || "Failed to update banner");
+          return;
+        }
+      } else {
+        if (!bannerData.title || !bannerData.image) {
+          alert("Banner title and image are required");
+          return;
+        }
+        const result = await createBanner(bannerData, token);
+        if (!result.success) {
+          alert(result.error || "Failed to create banner");
+          return;
+        }
+      }
+
+      await loadData();
+      setShowBannerForm(false);
+      setEditingBanner(null);
+    } catch (error: unknown) {
+      console.error("Error saving banner:", error);
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      alert("Failed to save banner: " + errorMessage);
+    }
+  };
+
+  const handleDeleteBanner = async (id: number) => {
+    if (!token) {
+      alert("Please login first");
+      return;
+    }
+    if (!confirm("Delete this banner?")) return;
+    try {
+      await deleteBanner(id, token);
+      await loadData();
+    } catch (error) {
+      console.error("Error deleting banner:", error);
+      alert("Failed to delete banner");
+    }
+  };
+
   const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -175,7 +252,7 @@ export function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
+    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 text-gray-100">
       {/* Mobile Menu Button */}
       <div className="md:hidden fixed top-0 left-0 right-0 bg-gray-800 border-b border-gray-700 p-4 z-50 flex justify-between items-center">
         <h1 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
@@ -213,6 +290,7 @@ export function AdminDashboard() {
           {[
             { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
             { id: "products", label: "Products", icon: Package },
+            { id: "banners", label: "Banners", icon: Images },
             { id: "orders", label: "Orders", icon: ShoppingCart },
             { id: "analytics", label: "Analytics", icon: BarChart3 },
             { id: "settings", label: "Settings", icon: Settings },
@@ -247,7 +325,8 @@ export function AdminDashboard() {
       </div>
 
       {/* Main Content */}
-      <div className="md:ml-64 p-4 md:p-6 pt-20 md:pt-6">
+      <div className="md:ml-64 p-6 md:p-10 pt-24 md:pt-10 transition-all">
+        <div className="max-w-7xl mx-auto space-y-10">
         {/* Dashboard Tab */}
         {activeTab === "dashboard" && (
           <div className="space-y-6">
@@ -255,7 +334,7 @@ export function AdminDashboard() {
             
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <Card className="bg-gray-800 border-gray-700">
+              <Card className="bg-gray-900/60 border border-gray-800 shadow-lg backdrop-blur">
                 <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle className="text-gray-300">Total Products</CardTitle>
                   <Package className="h-8 w-8 text-blue-400" />
@@ -265,7 +344,7 @@ export function AdminDashboard() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-gray-800 border-gray-700">
+              <Card className="bg-gray-900/60 border border-gray-800 shadow-lg backdrop-blur">
                 <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle className="text-gray-300">Total Orders</CardTitle>
                   <ShoppingCart className="h-8 w-8 text-green-400" />
@@ -275,7 +354,7 @@ export function AdminDashboard() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-gray-800 border-gray-700">
+              <Card className="bg-gray-900/60 border border-gray-800 shadow-lg backdrop-blur">
                 <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle className="text-gray-300">Total Revenue</CardTitle>
                   <DollarSign className="h-8 w-8 text-yellow-400" />
@@ -287,7 +366,7 @@ export function AdminDashboard() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-gray-800 border-gray-700">
+            <Card className="bg-gray-900/60 border border-gray-800 shadow-lg backdrop-blur">
                 <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle className="text-gray-300">In Stock</CardTitle>
                   <TrendingUp className="h-8 w-8 text-purple-400" />
@@ -299,7 +378,7 @@ export function AdminDashboard() {
             </div>
 
             {/* Recent Orders */}
-            <Card className="bg-gray-800 border-gray-700">
+            <Card className="bg-gray-900/60 border border-gray-800 shadow-lg backdrop-blur">
               <CardHeader>
                 <CardTitle>Recent Orders</CardTitle>
               </CardHeader>
@@ -422,11 +501,124 @@ export function AdminDashboard() {
           </div>
         )}
 
+        {/* Banners Tab */}
+        {activeTab === "banners" && (
+          <div className="space-y-6">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <p className="text-sm uppercase tracking-widest text-blue-400 font-semibold">
+                  Hero Slider
+                </p>
+                <h2 className="text-2xl sm:text-3xl font-bold">Banner Management</h2>
+                <p className="text-gray-400">Control the homepage hero carousel order, copy, and CTAs.</p>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={loadData}
+                  className="border-gray-600 text-gray-300 hover:bg-gray-800"
+                >
+                  Refresh
+                </Button>
+                <Button
+                  onClick={() => {
+                    setEditingBanner(null);
+                    setShowBannerForm(true);
+                  }}
+                  className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 shadow-lg"
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  New Banner
+                </Button>
+              </div>
+            </div>
+
+            <Card className="bg-gray-900/60 border-gray-800">
+              <CardContent className="p-4 sm:p-6">
+                {banners.length === 0 ? (
+                  <div className="text-center py-16 text-gray-400">
+                    No banners configured yet.
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                    {banners.map((banner) => (
+                      <div
+                        key={banner.id}
+                        className="bg-gray-800/70 border border-gray-700 rounded-xl overflow-hidden flex flex-col shadow-lg"
+                      >
+                        <div className="relative h-48">
+                          <img
+                            src={banner.image}
+                            alt={banner.title}
+                            className="w-full h-full object-cover"
+                          />
+                          <span className="absolute top-3 left-3 bg-black/60 text-xs px-3 py-1 rounded-full">
+                            Order #{banner.orderIndex ?? 0}
+                          </span>
+                          <span
+                            className={`absolute top-3 right-3 text-xs px-3 py-1 rounded-full ${
+                              banner.isActive === false
+                                ? "bg-red-500/20 text-red-300"
+                                : "bg-green-500/20 text-green-300"
+                            }`}
+                          >
+                            {banner.isActive === false ? "Hidden" : "Live"}
+                          </span>
+                        </div>
+                        <div className="p-4 space-y-3 flex-1 flex flex-col">
+                          <div>
+                            <h3 className="text-lg font-semibold">{banner.title}</h3>
+                            <p className="text-sm text-gray-400 line-clamp-2">
+                              {banner.subtitle || "—"}
+                            </p>
+                          </div>
+                          <div className="text-sm text-gray-400 space-y-1">
+                            {banner.buttonText && (
+                              <p className="flex items-center gap-2">
+                                <span className="text-gray-500 uppercase tracking-wide text-xs">CTA</span>
+                                {banner.buttonText}
+                              </p>
+                            )}
+                            {banner.buttonLink && (
+                              <p className="flex items-center gap-2 break-all">
+                                <Link2 className="h-4 w-4 text-gray-500" />
+                                {banner.buttonLink}
+                              </p>
+                            )}
+                          </div>
+                          <div className="flex gap-2 pt-2 mt-auto">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleEditBanner(banner)}
+                              className="flex-1 border-gray-600 text-gray-200 hover:bg-gray-700"
+                            >
+                              <Edit className="h-4 w-4 mr-2" /> Edit
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleDeleteBanner(banner.id)}
+                              className="flex-1 border-red-600 text-red-400 hover:bg-red-900/20"
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" /> Delete
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
         {/* Orders Tab */}
         {activeTab === "orders" && (
           <div className="space-y-6">
             <h2 className="text-3xl font-bold">Orders Management</h2>
-            <Card className="bg-gray-800 border-gray-700">
+            <Card className="bg-gray-900/60 border border-gray-800 shadow-lg backdrop-blur">
               <CardHeader>
                 <CardTitle>All Orders</CardTitle>
               </CardHeader>
@@ -484,7 +676,7 @@ export function AdminDashboard() {
           <div className="space-y-6">
             <h2 className="text-3xl font-bold">Analytics</h2>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card className="bg-gray-800 border-gray-700">
+            <Card className="bg-gray-900/60 border border-gray-800 shadow-lg backdrop-blur">
                 <CardHeader>
                   <CardTitle>Sales Overview</CardTitle>
                 </CardHeader>
@@ -544,7 +736,7 @@ export function AdminDashboard() {
         {activeTab === "settings" && (
           <div className="space-y-6">
             <h2 className="text-3xl font-bold">Settings</h2>
-            <Card className="bg-gray-800 border-gray-700">
+            <Card className="bg-gray-900/60 border border-gray-800 shadow-lg backdrop-blur">
               <CardHeader>
                 <CardTitle>General Settings</CardTitle>
               </CardHeader>
@@ -587,6 +779,7 @@ export function AdminDashboard() {
             </Card>
           </div>
         )}
+        </div>
       </div>
 
       {/* Product Form Modal */}
@@ -597,6 +790,16 @@ export function AdminDashboard() {
           onClose={() => {
             setShowProductForm(false);
             setEditingProduct(null);
+          }}
+        />
+      )}
+      {showBannerForm && (
+        <BannerFormModal
+          banner={editingBanner}
+          onSave={handleSaveBanner}
+          onClose={() => {
+            setShowBannerForm(false);
+            setEditingBanner(null);
           }}
         />
       )}
@@ -748,6 +951,147 @@ function ProductFormModal({
               variant="outline"
               onClick={onClose}
               className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-700"
+            >
+              Cancel
+            </Button>
+          </div>
+        </form>
+      </motion.div>
+    </div>
+  );
+}
+
+function BannerFormModal({
+  banner,
+  onSave,
+  onClose,
+}: {
+  banner: Banner | null;
+  onSave: (data: Partial<Banner>) => void;
+  onClose: () => void;
+}) {
+  const [formData, setFormData] = useState<Partial<Banner>>({
+    title: banner?.title || "",
+    subtitle: banner?.subtitle || "",
+    image: banner?.image || "",
+    buttonText: banner?.buttonText || "",
+    buttonLink: banner?.buttonLink || "",
+    orderIndex: banner?.orderIndex ?? 0,
+    isActive: banner?.isActive ?? true,
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSave(formData);
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="bg-gray-900 rounded-2xl p-4 md:p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-gray-800 shadow-2xl"
+      >
+        <div className="flex items-start justify-between gap-4 mb-4">
+          <div>
+            <p className="text-xs uppercase tracking-[0.4em] text-blue-400">Hero Banner</p>
+            <h3 className="text-2xl font-bold">{banner ? "Edit Banner" : "Add Banner"}</h3>
+          </div>
+          <button onClick={onClose} className="text-gray-400 hover:text-white">
+            ✕
+          </button>
+        </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <label className="text-sm font-medium text-gray-300 mb-2 block">
+                Title
+              </label>
+              <Input
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                placeholder="Banner title"
+                className="bg-gray-800 border-gray-700 text-white"
+                required
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-300 mb-2 block">
+                Order Index
+              </label>
+              <Input
+                type="number"
+                value={formData.orderIndex}
+                onChange={(e) => setFormData({ ...formData, orderIndex: Number(e.target.value) })}
+                className="bg-gray-800 border-gray-700 text-white"
+                min={0}
+              />
+            </div>
+          </div>
+          <div>
+            <label className="text-sm font-medium text-gray-300 mb-2 block">
+              Subtitle
+            </label>
+            <textarea
+              value={formData.subtitle}
+              onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })}
+              className="w-full p-3 bg-gray-800 border border-gray-700 rounded-md text-white min-h-[80px]"
+              placeholder="Supporting text"
+            />
+          </div>
+          <ImageUpload
+            onImageSelect={(base64) => setFormData({ ...formData, image: base64 })}
+            currentImage={formData.image}
+            label="Banner Image"
+          />
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <label className="text-sm font-medium text-gray-300 mb-2 block">
+                Button Text
+              </label>
+              <Input
+                value={formData.buttonText}
+                onChange={(e) => setFormData({ ...formData, buttonText: e.target.value })}
+                placeholder="Optional e.g., Shop Now"
+                className="bg-gray-800 border-gray-700 text-white"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-300 mb-2 block">
+                Button Link
+              </label>
+              <Input
+                value={formData.buttonLink}
+                onChange={(e) => setFormData({ ...formData, buttonLink: e.target.value })}
+                placeholder="/products"
+                className="bg-gray-800 border-gray-700 text-white"
+              />
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <input
+              type="checkbox"
+              id="banner-active"
+              checked={formData.isActive}
+              onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+              className="w-4 h-4"
+            />
+            <label htmlFor="banner-active" className="text-sm text-gray-300">
+              Display this banner on the homepage
+            </label>
+          </div>
+          <div className="flex gap-3 pt-2">
+            <Button
+              type="submit"
+              className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+            >
+              {banner ? "Update Banner" : "Create Banner"}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-800"
             >
               Cancel
             </Button>

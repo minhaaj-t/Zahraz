@@ -1,5 +1,30 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://zahraz-server.vercel.app/api';
 
+async function parseJsonResponse<T = any>(response: Response): Promise<T> {
+  const contentType = response.headers.get('content-type');
+  if (!contentType || !contentType.includes('application/json')) {
+    const text = await response.text();
+    console.error('Non-JSON response:', text.substring(0, 200));
+    throw new Error(`Server returned ${response.status} ${response.statusText}`);
+  }
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.error || data.message || `HTTP ${response.status}: ${response.statusText}`);
+  }
+  return data;
+}
+
+export interface Banner {
+  id: number;
+  title: string;
+  subtitle?: string;
+  image: string;
+  buttonText?: string;
+  buttonLink?: string;
+  orderIndex?: number;
+  isActive?: boolean;
+}
+
 export async function fetchProducts() {
   const response = await fetch(`${API_BASE_URL}/products`);
   const data = await response.json();
@@ -94,22 +119,7 @@ export async function createProduct(productData: Partial<{
     },
     body: JSON.stringify(productData),
   });
-  
-  // Check if response is JSON
-  const contentType = response.headers.get('content-type');
-  if (!contentType || !contentType.includes('application/json')) {
-    const text = await response.text();
-    console.error('Non-JSON response:', text.substring(0, 200));
-    throw new Error(`Server returned ${response.status}: ${response.statusText}. Expected JSON but got ${contentType || 'unknown'}`);
-  }
-  
-  const data = await response.json();
-  
-  if (!response.ok) {
-    throw new Error(data.error || data.message || `HTTP ${response.status}: ${response.statusText}`);
-  }
-  
-  return data;
+  return parseJsonResponse(response);
 }
 
 export async function updateProduct(id: number, productData: Partial<{
@@ -131,22 +141,7 @@ export async function updateProduct(id: number, productData: Partial<{
     },
     body: JSON.stringify(productData),
   });
-  
-  // Check if response is JSON
-  const contentType = response.headers.get('content-type');
-  if (!contentType || !contentType.includes('application/json')) {
-    const text = await response.text();
-    console.error('Non-JSON response:', text.substring(0, 200));
-    throw new Error(`Server returned ${response.status}: ${response.statusText}. Expected JSON but got ${contentType || 'unknown'}`);
-  }
-  
-  const data = await response.json();
-  
-  if (!response.ok) {
-    throw new Error(data.error || data.message || `HTTP ${response.status}: ${response.statusText}`);
-  }
-  
-  return data;
+  return parseJsonResponse(response);
 }
 
 export async function deleteProduct(id: number, token: string) {
@@ -156,7 +151,46 @@ export async function deleteProduct(id: number, token: string) {
       'Authorization': `Bearer ${token}`,
     },
   });
+  return parseJsonResponse(response);
+}
+
+export async function fetchBanners(): Promise<Banner[]> {
+  const response = await fetch(`${API_BASE_URL}/banners`);
   const data = await response.json();
-  return data;
+  return data.success ? data.data : [];
+}
+
+export async function createBanner(bannerData: Partial<Banner>, token: string) {
+  const response = await fetch(`${API_BASE_URL}/banners`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify(bannerData),
+  });
+  return parseJsonResponse(response);
+}
+
+export async function updateBanner(id: number, bannerData: Partial<Banner>, token: string) {
+  const response = await fetch(`${API_BASE_URL}/banners/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify(bannerData),
+  });
+  return parseJsonResponse(response);
+}
+
+export async function deleteBanner(id: number, token: string) {
+  const response = await fetch(`${API_BASE_URL}/banners/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+  return parseJsonResponse(response);
 }
 
