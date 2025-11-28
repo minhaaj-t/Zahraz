@@ -85,7 +85,21 @@ router.post('/', verifyToken, async (req, res) => {
     // If image is base64, upload to ImgBB
     let imageUrl = image;
     if (image && image.startsWith('data:image')) {
-      imageUrl = await uploadBase64ToImgBB(image);
+      try {
+        imageUrl = await uploadBase64ToImgBB(image);
+        console.log('✅ Image uploaded successfully:', imageUrl);
+      } catch (uploadError) {
+        console.error('❌ Image upload error:', uploadError);
+        return res.status(500).json({ 
+          success: false, 
+          error: 'Failed to upload image: ' + uploadError.message 
+        });
+      }
+    } else if (!image || image === '') {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Product image is required' 
+      });
     }
 
     const [result] = await pool.query(
@@ -105,8 +119,14 @@ router.post('/', verifyToken, async (req, res) => {
     );
 
     const [newProduct] = await pool.query('SELECT * FROM products WHERE id = ?', [result.insertId]);
-    res.status(201).json({ success: true, data: newProduct[0] });
+    const parsedProduct = {
+      ...newProduct[0],
+      images: newProduct[0].images ? JSON.parse(newProduct[0].images) : [newProduct[0].image],
+      inStock: Boolean(newProduct[0].inStock)
+    };
+    res.status(201).json({ success: true, data: parsedProduct });
   } catch (error) {
+    console.error('Create product error:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });
