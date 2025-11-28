@@ -23,6 +23,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { type Product } from "@/lib/products";
 import { fetchProducts, fetchOrders, fetchStats, createProduct, updateProduct, deleteProduct } from "@/lib/api";
 import { ImageUpload } from "@/components/image-upload";
+import { MultiImageUpload } from "@/components/multi-image-upload";
 
 export function AdminDashboard() {
   const router = useRouter();
@@ -702,6 +703,12 @@ function ProductFormModal({
               />
             </div>
           )}
+          <MultiImageUpload
+            images={Array.isArray(formData.images) ? formData.images : []}
+            onChange={(imgs) => setFormData({ ...formData, images: imgs })}
+            label="Gallery Images (optional)"
+            limit={6}
+          />
           <div>
             <label className="text-sm font-medium text-gray-300 mb-2 block">
               Description

@@ -77,17 +77,50 @@ router.get('/:id/related', async (req, res) => {
   }
 });
 
+// Helper to normalize images payload
+const normalizeImagesPayload = (images) => {
+  if (!images) return [];
+  if (Array.isArray(images)) return images;
+  try {
+    const parsed = JSON.parse(images);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+};
+
+const processGalleryImages = async (imagesList = []) => {
+  const processed = [];
+  for (const img of imagesList) {
+    if (!img) continue;
+    if (typeof img === 'string' && img.startsWith('data:image')) {
+      const uploaded = await uploadBase64ToImgBB(img);
+      processed.push(uploaded);
+    } else {
+      processed.push(img);
+    }
+  }
+  return processed;
+};
+
 // Create product (protected)
 router.post('/', verifyToken, async (req, res) => {
   try {
     const { name, price, image, images, description, category, rating, reviews, inStock } = req.body;
     
-    // If image is base64, upload to ImgBB
+    // Validate main image
+    if (!image || image === '') {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Product image is required' 
+      });
+    }
+    
+    // Process main image
     let imageUrl = image;
     if (image && image.startsWith('data:image')) {
       try {
         imageUrl = await uploadBase64ToImgBB(image);
-        console.log('✅ Image uploaded successfully:', imageUrl);
       } catch (uploadError) {
         console.error('❌ Image upload error:', uploadError);
         return res.status(500).json({ 
@@ -95,12 +128,14 @@ router.post('/', verifyToken, async (req, res) => {
           error: 'Failed to upload image: ' + uploadError.message 
         });
       }
-    } else if (!image || image === '') {
-      return res.status(400).json({ 
-        success: false, 
-        error: 'Product image is required' 
-      });
     }
+
+    // Process gallery images
+    const normalizedImages = normalizeImagesPayload(images);
+    let galleryImages = await processGalleryImages(normalizedImages);
+
+    // Ensure main image is first and unique
+    galleryImages = [imageUrl, ...galleryImages.filter(img => img && img !== imageUrl)];
 
     const [result] = await pool.query(
       `INSERT INTO products (name, price, image, images, description, category, rating, reviews, inStock) 
@@ -109,7 +144,7 @@ router.post('/', verifyToken, async (req, res) => {
         name,
         price,
         imageUrl,
-        JSON.stringify(images || [imageUrl]),
+        JSON.stringify(galleryImages),
         description,
         category,
         rating || 4.5,
@@ -136,14 +171,15 @@ router.put('/:id', verifyToken, async (req, res) => {
   try {
     const { name, price, image, images, description, category, rating, reviews, inStock } = req.body;
     
-    // Get existing product to preserve image if not changed
+    // Get existing product to preserve data if not changed
     const [existingProducts] = await pool.query('SELECT * FROM products WHERE id = ?', [req.params.id]);
     if (existingProducts.length === 0) {
       return res.status(404).json({ success: false, error: 'Product not found' });
     }
     const existingProduct = existingProducts[0];
+    const existingImages = existingProduct.images ? JSON.parse(existingProduct.images) : [existingProduct.image];
     
-    // If image is base64, upload to ImgBB
+    // Process main image
     let imageUrl = image;
     if (image && image.startsWith('data:image')) {
       try {
@@ -153,17 +189,27 @@ router.put('/:id', verifyToken, async (req, res) => {
         return res.status(500).json({ success: false, error: 'Failed to upload image: ' + uploadError.message });
       }
     } else if (!image || image === '') {
-      // If no image provided, keep existing image
       imageUrl = existingProduct.image;
     }
 
-    // Prepare images array
-    let imagesArray = images;
-    if (!imagesArray || imagesArray.length === 0) {
+    // Process gallery images if provided, otherwise keep existing
+    let imagesArray = existingImages;
+    const normalizedImages = normalizeImagesPayload(images);
+    if (normalizedImages.length > 0) {
+      try {
+        imagesArray = await processGalleryImages(normalizedImages);
+      } catch (galleryError) {
+        console.error('Gallery image upload error:', galleryError);
+        return res.status(500).json({ success: false, error: 'Failed to upload gallery image: ' + galleryError.message });
+      }
+    }
+
+    // Ensure images array is valid and main image first
+    imagesArray = Array.isArray(imagesArray) ? imagesArray.filter(Boolean) : [];
+    if (imagesArray.length === 0) {
       imagesArray = [imageUrl];
-    } else if (image && image.startsWith('data:image')) {
-      // If new image uploaded, update images array
-      imagesArray = [imageUrl, ...imagesArray.filter(img => img !== imageUrl)];
+    } else {
+      imagesArray = [imageUrl, ...imagesArray.filter(img => img && img !== imageUrl)];
     }
 
     await pool.query(
