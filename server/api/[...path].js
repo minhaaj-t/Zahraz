@@ -32,6 +32,28 @@ app.get('/', (req, res) => {
   res.json({ success: true, message: 'ZAHRAZ Backend API', endpoints: ['/api/products', '/api/orders', '/api/auth', '/api/stats', '/api/health'] });
 });
 
+// Error handling middleware - must be added after routes
+app.use((err, req, res, next) => {
+  console.error('Express error:', err);
+  if (!res.headersSent) {
+    res.status(err.status || 500).json({
+      success: false,
+      error: err.message || 'Internal server error',
+      ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+    });
+  }
+});
+
+// 404 handler - must be after all routes
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    error: 'Route not found',
+    path: req.path,
+    method: req.method
+  });
+});
+
 // Initialize database on cold start
 let dbInitialized = false;
 
@@ -59,7 +81,11 @@ module.exports = async (req, res) => {
   } catch (error) {
     console.error('Handler error:', error);
     if (!res.headersSent) {
-      res.status(500).json({ success: false, error: 'Internal server error', message: error.message });
+      res.status(500).json({ 
+        success: false, 
+        error: 'Internal server error', 
+        message: error.message 
+      });
     }
   }
 };
