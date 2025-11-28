@@ -355,7 +355,10 @@ export function ModernEcommerceWhatsapp() {
                   ease: "easeInOut",
                 }}
               >
-                <Plane className="h-10 w-10 text-blue-500 drop-shadow-2xl" style={{ filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3))' }} />
+                <Plane
+                  className="h-10 w-10 text-black drop-shadow-2xl"
+                  style={{ filter: "drop-shadow(0 4px 6px rgba(0, 0, 0, 0.45))" }}
+                />
               </motion.div>
             </motion.div>
           </motion.div>
@@ -516,15 +519,15 @@ export function ModernEcommerceWhatsapp() {
 
       {/* Banner Slider */}
       <section className="relative w-full overflow-hidden">
-        <Carousel 
-          className="w-full" 
+        <Carousel
+          className="w-full"
           opts={{ loop: true, align: "start" }}
           setApi={setApi}
         >
           <CarouselContent className="-ml-0">
             {heroBanners.map((banner) => (
               <CarouselItem key={banner.id} className="pl-0">
-                <div className="relative w-full h-[400px] md:h-[500px] lg:h-[600px] overflow-hidden">
+                <div className="relative w-full h-[320px] sm:h-[420px] md:h-[520px] lg:h-[620px] overflow-hidden">
                   <motion.div
                     key={banner.id}
                     initial={{ opacity: 0, scale: 1.1 }}
@@ -537,7 +540,7 @@ export function ModernEcommerceWhatsapp() {
                       alt={banner.title}
                       className="w-full h-full object-cover"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/55 to-transparent" />
                   </motion.div>
                   <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center">
                     <motion.div
@@ -545,13 +548,13 @@ export function ModernEcommerceWhatsapp() {
                       initial={{ opacity: 0, x: -50 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.3, duration: 0.8 }}
-                      className="max-w-2xl text-white w-full"
+                      className="max-w-3xl text-white w-full text-center lg:text-left mx-auto lg:mx-0"
                     >
                       <motion.h2
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.5, duration: 0.6 }}
-                        className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-3 sm:mb-4 leading-tight"
+                        className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-3 sm:mb-4 leading-tight text-balance"
                       >
                         {banner.title}
                       </motion.h2>
@@ -559,7 +562,7 @@ export function ModernEcommerceWhatsapp() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.7, duration: 0.6 }}
-                        className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl mb-4 sm:mb-6 md:mb-8 text-gray-200"
+                        className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl mb-4 sm:mb-6 md:mb-8 text-gray-200 max-w-2xl mx-auto lg:mx-0 text-balance"
                       >
                         {banner.subtitle}
                       </motion.p>
