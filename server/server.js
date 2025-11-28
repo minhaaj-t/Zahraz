@@ -27,21 +27,30 @@ app.get('/api/health', (req, res) => {
   res.json({ success: true, message: 'Server is running' });
 });
 
-// Initialize database and start server
-async function startServer() {
-  try {
-    await initDatabase();
-    await insertDummyData();
-    
-    app.listen(PORT, () => {
-      console.log(`🚀 Server running on http://localhost:${PORT}`);
-      console.log(`📊 API endpoints available at http://localhost:${PORT}/api`);
-    });
-  } catch (error) {
-    console.error('Failed to start server:', error);
-    process.exit(1);
+// Root route
+app.get('/', (req, res) => {
+  res.json({ success: true, message: 'ZAHRAZ Backend API' });
+});
+
+// Initialize database on startup (only for non-serverless environments)
+if (process.env.VERCEL !== '1') {
+  async function startServer() {
+    try {
+      await initDatabase();
+      await insertDummyData();
+      
+      app.listen(PORT, () => {
+        console.log(`🚀 Server running on http://localhost:${PORT}`);
+        console.log(`📊 API endpoints available at http://localhost:${PORT}/api`);
+      });
+    } catch (error) {
+      console.error('Failed to start server:', error);
+      process.exit(1);
+    }
   }
+  startServer();
 }
 
-startServer();
+// Export for Vercel serverless functions
+module.exports = app;
 
