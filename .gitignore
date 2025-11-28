@@ -35,7 +35,7 @@ yarn-error.log*
 
 # vercel
 .vercel
-.vercelignore
+# Note: .vercelignore should be committed
 
 # typescript
 *.tsbuildinfo
