@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://zahraz-server.vercel.app/api';
 
 export async function fetchProducts() {
   const response = await fetch(`${API_BASE_URL}/products`);
