@@ -1,4 +1,4 @@
-// Vercel serverless function entry point
+// Vercel catch-all serverless function
 const express = require('express');
 const cors = require('cors');
 const { initDatabase, insertDummyData } = require('../config/initDatabase');
@@ -29,7 +29,7 @@ app.get('/api/health', (req, res) => {
 
 // Root route
 app.get('/', (req, res) => {
-  res.json({ success: true, message: 'ZAHRAZ Backend API' });
+  res.json({ success: true, message: 'ZAHRAZ Backend API', endpoints: ['/api/products', '/api/orders', '/api/auth', '/api/stats', '/api/health'] });
 });
 
 // Initialize database on cold start
@@ -41,29 +41,26 @@ async function initializeDatabase() {
       await initDatabase();
       await insertDummyData();
       dbInitialized = true;
+      console.log('✅ Database initialized');
     } catch (error) {
-      console.error('Database initialization error:', error);
+      console.error('❌ Database initialization error:', error);
     }
   }
 }
 
 // Vercel serverless function handler
-let handler;
-
-async function getHandler() {
-  if (!handler) {
-    await initializeDatabase();
-    handler = app;
-  }
-  return handler;
-}
-
 module.exports = async (req, res) => {
   try {
-    const appHandler = await getHandler();
-    return appHandler(req, res);
+    // Initialize database on first request
+    await initializeDatabase();
+    
+    // Handle the request with Express app
+    app(req, res);
   } catch (error) {
     console.error('Handler error:', error);
-    res.status(500).json({ success: false, error: 'Internal server error' });
+    if (!res.headersSent) {
+      res.status(500).json({ success: false, error: 'Internal server error', message: error.message });
+    }
   }
 };
+
