@@ -59,7 +59,6 @@ export default function WishlistPage() {
     }
 
     localStorage.setItem("cart", JSON.stringify(cart));
-    setCartItems(cart);
   };
 
   return (
