@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+import { Playfair_Display } from "next/font/google";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
@@ -27,6 +29,13 @@ import {
 
 import { type Product } from "@/lib/products";
 import { fetchProducts, fetchFeaturedProducts, createOrder } from "@/lib/api";
+import zahrazLogo from "@/app/images/zahraz.png";
+
+const boutiqueFont = Playfair_Display({
+  subsets: ["latin"],
+  weight: ["600"],
+  display: "swap",
+});
 
 // Banner Slider Data
 interface Banner {
@@ -363,12 +372,15 @@ export function ModernEcommerceWhatsapp() {
               animate={{ opacity: 1, x: 0 }}
               className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1"
             >
-              <img
-                src="https://i.postimg.cc/Gt6Xnd2P/Gold-and-Black-Minimalist-Monogram-Personal-Logo-20241107-185515-0000.png"
-                alt="ZAHRAZ Logo"
-                className="h-10 w-10 sm:h-12 sm:w-12 object-contain flex-shrink-0"
+              <Image
+                src={zahrazLogo}
+                alt="ZAHRA'Z Boutique Logo"
+                className="h-10 w-10 sm:h-12 sm:w-12 object-contain flex-shrink-0 drop-shadow-lg"
+                priority
               />
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent truncate">
+              <h1
+                className={`${boutiqueFont.className} text-xl sm:text-2xl md:text-3xl font-semibold tracking-wide bg-gradient-to-r from-gray-900 via-gray-700 to-gray-500 bg-clip-text text-transparent truncate`}
+              >
                 ZAHRA&apos;Z
               </h1>
             </motion.div>
