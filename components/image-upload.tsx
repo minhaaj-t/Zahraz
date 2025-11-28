@@ -15,15 +15,74 @@ export function ImageUpload({ onImageSelect, currentImage, label = "Upload Image
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileSelect = (file: File) => {
-    if (file && file.type.startsWith("image/")) {
+  const compressImage = (file: File, maxWidth: number = 1920, maxHeight: number = 1920, quality: number = 0.8): Promise<string> => {
+    return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64String = reader.result as string;
-        setPreview(base64String);
-        onImageSelect(base64String);
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+
+          // Calculate new dimensions
+          if (width > height) {
+            if (width > maxWidth) {
+              height = (height * maxWidth) / width;
+              width = maxWidth;
+            }
+          } else {
+            if (height > maxHeight) {
+              width = (width * maxHeight) / height;
+              height = maxHeight;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            reject(new Error('Could not get canvas context'));
+            return;
+          }
+
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+          resolve(compressedBase64);
+        };
+        img.onerror = reject;
+        img.src = e.target?.result as string;
       };
+      reader.onerror = reject;
       reader.readAsDataURL(file);
+    });
+  };
+
+  const handleFileSelect = async (file: File) => {
+    if (file && file.type.startsWith("image/")) {
+      // Check file size (10MB limit)
+      if (file.size > 10 * 1024 * 1024) {
+        alert("Image is too large. Please select an image smaller than 10MB.");
+        return;
+      }
+
+      try {
+        // Compress image before converting to base64
+        const compressedBase64 = await compressImage(file);
+        setPreview(compressedBase64);
+        onImageSelect(compressedBase64);
+      } catch (error) {
+        console.error("Error compressing image:", error);
+        // Fallback to original if compression fails
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const base64String = reader.result as string;
+          setPreview(base64String);
+          onImageSelect(base64String);
+        };
+        reader.readAsDataURL(file);
+      }
     }
   };
 
@@ -116,7 +175,7 @@ export function ImageUpload({ onImageSelect, currentImage, label = "Upload Image
         />
       </div>
       <p className="text-xs text-gray-500">
-        Supported formats: JPG, PNG, GIF. Max size: 10MB
+        Supported formats: JPG, PNG, GIF. Max size: 10MB. Images are automatically compressed.
       </p>
     </div>
   );
