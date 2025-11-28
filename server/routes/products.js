@@ -116,10 +116,34 @@ router.put('/:id', verifyToken, async (req, res) => {
   try {
     const { name, price, image, images, description, category, rating, reviews, inStock } = req.body;
     
+    // Get existing product to preserve image if not changed
+    const [existingProducts] = await pool.query('SELECT * FROM products WHERE id = ?', [req.params.id]);
+    if (existingProducts.length === 0) {
+      return res.status(404).json({ success: false, error: 'Product not found' });
+    }
+    const existingProduct = existingProducts[0];
+    
     // If image is base64, upload to ImgBB
     let imageUrl = image;
     if (image && image.startsWith('data:image')) {
-      imageUrl = await uploadBase64ToImgBB(image);
+      try {
+        imageUrl = await uploadBase64ToImgBB(image);
+      } catch (uploadError) {
+        console.error('Image upload error:', uploadError);
+        return res.status(500).json({ success: false, error: 'Failed to upload image: ' + uploadError.message });
+      }
+    } else if (!image || image === '') {
+      // If no image provided, keep existing image
+      imageUrl = existingProduct.image;
+    }
+
+    // Prepare images array
+    let imagesArray = images;
+    if (!imagesArray || imagesArray.length === 0) {
+      imagesArray = [imageUrl];
+    } else if (image && image.startsWith('data:image')) {
+      // If new image uploaded, update images array
+      imagesArray = [imageUrl, ...imagesArray.filter(img => img !== imageUrl)];
     }
 
     await pool.query(
@@ -131,19 +155,25 @@ router.put('/:id', verifyToken, async (req, res) => {
         name,
         price,
         imageUrl,
-        JSON.stringify(images || [imageUrl]),
-        description,
-        category,
-        rating,
-        reviews,
-        inStock,
+        JSON.stringify(imagesArray),
+        description || existingProduct.description,
+        category || existingProduct.category,
+        rating !== undefined ? rating : existingProduct.rating,
+        reviews !== undefined ? reviews : existingProduct.reviews,
+        inStock !== undefined ? inStock : existingProduct.inStock,
         req.params.id
       ]
     );
 
     const [updatedProduct] = await pool.query('SELECT * FROM products WHERE id = ?', [req.params.id]);
-    res.json({ success: true, data: updatedProduct[0] });
+    const parsedProduct = {
+      ...updatedProduct[0],
+      images: updatedProduct[0].images ? JSON.parse(updatedProduct[0].images) : [updatedProduct[0].image],
+      inStock: Boolean(updatedProduct[0].inStock)
+    };
+    res.json({ success: true, data: parsedProduct });
   } catch (error) {
+    console.error('Update product error:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });

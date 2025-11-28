@@ -116,24 +116,47 @@ export function AdminDashboard() {
         return;
       }
 
+      // Prepare product data - ensure image is properly handled
+      const dataToSend = { ...productData };
+      
+      // If updating and image hasn't changed (it's a URL, not base64), keep it
+      if (editingProduct && dataToSend.image && !dataToSend.image.startsWith('data:image')) {
+        // Image is already a URL, keep it as is
+      } else if (!dataToSend.image || dataToSend.image === '') {
+        // If no image provided when updating, don't send image field (backend will keep existing)
+        if (editingProduct) {
+          delete dataToSend.image;
+        }
+      }
+
       if (editingProduct) {
         // Update existing product
-        const result = await updateProduct(editingProduct.id, productData, token);
+        const result = await updateProduct(editingProduct.id, dataToSend, token);
         if (result.success) {
           await loadData(); // Reload to sync with backend
+          setShowProductForm(false);
+          setEditingProduct(null);
+        } else {
+          alert(result.error || "Failed to update product");
         }
       } else {
         // Add new product
-        const result = await createProduct(productData, token);
+        if (!dataToSend.image || dataToSend.image === '') {
+          alert("Please upload a product image");
+          return;
+        }
+        const result = await createProduct(dataToSend, token);
         if (result.success) {
           await loadData(); // Reload to sync with backend
+          setShowProductForm(false);
+          setEditingProduct(null);
+        } else {
+          alert(result.error || "Failed to create product");
         }
       }
-      setShowProductForm(false);
-      setEditingProduct(null);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error saving product:", error);
-      alert("Failed to save product");
+      alert("Failed to save product: " + (error.message || "Unknown error"));
     }
   };
 
