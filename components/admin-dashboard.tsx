@@ -26,7 +26,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { type Product } from "@/lib/products";
 import {
   type Banner,
-  type ApiResponse,
   fetchProducts,
   fetchOrders,
   fetchStats,
