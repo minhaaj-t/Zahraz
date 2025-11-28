@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { ShoppingCart, Heart, Send, Search, Star, Plus, Minus, Trash2 } from "lucide-react";
+import { ShoppingCart, Heart, Send, Search, Star, Plus, Minus, Trash2, Plane } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -74,9 +74,38 @@ export function ModernEcommerceWhatsapp() {
   const [products, setProducts] = useState<Product[]>([]);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [flyingAirplane, setFlyingAirplane] = useState<{
+    startX: number;
+    startY: number;
+    endX: number;
+    endY: number;
+  } | null>(null);
 
-  // Add product to cart
-  const addToCart = (product: Product) => {
+  // Add product to cart with airplane animation
+  const addToCart = (product: Product, buttonElement?: HTMLElement | null) => {
+    // Get button position if provided
+    if (buttonElement) {
+      const buttonRect = buttonElement.getBoundingClientRect();
+      const startX = buttonRect.left + buttonRect.width / 2;
+      const startY = buttonRect.top + buttonRect.height / 2;
+
+      // Get cart icon position
+      const cartIcon = document.querySelector('[data-cart-icon]') as HTMLElement;
+      if (cartIcon) {
+        const cartRect = cartIcon.getBoundingClientRect();
+        const endX = cartRect.left + cartRect.width / 2;
+        const endY = cartRect.top + cartRect.height / 2;
+
+        // Trigger airplane animation
+        setFlyingAirplane({ startX, startY, endX, endY });
+
+        // Remove animation after it completes
+        setTimeout(() => {
+          setFlyingAirplane(null);
+        }, 2000);
+      }
+    }
+
     // Ensure price is a number
     const productWithNumberPrice = {
       ...product,
@@ -260,6 +289,71 @@ export function ModernEcommerceWhatsapp() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 pb-20 md:pb-0">
+      {/* Flying Airplane Animation */}
+      <AnimatePresence>
+        {flyingAirplane && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed z-[9999] pointer-events-none"
+            style={{
+              left: flyingAirplane.startX,
+              top: flyingAirplane.startY,
+            }}
+          >
+            <motion.div
+              initial={{
+                x: 0,
+                y: 0,
+                rotate: -45,
+                scale: 1,
+              }}
+              animate={{
+                x: flyingAirplane.endX - flyingAirplane.startX,
+                y: flyingAirplane.endY - flyingAirplane.startY,
+                rotate: [
+                  -45,
+                  -30,
+                  -20,
+                  -10,
+                  0,
+                  10,
+                  20,
+                  30,
+                  45,
+                ],
+                scale: [1, 1.3, 1.1, 0.9, 0.7],
+              }}
+              transition={{
+                duration: 1.5,
+                ease: [0.42, 0, 0.58, 1], // Custom cubic bezier for smooth curve
+                rotate: {
+                  duration: 1.5,
+                  ease: "easeInOut",
+                },
+                scale: {
+                  duration: 1.5,
+                  ease: "easeInOut",
+                },
+              }}
+            >
+              <motion.div
+                animate={{
+                  y: [0, -10, 0],
+                }}
+                transition={{
+                  duration: 0.3,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              >
+                <Plane className="h-10 w-10 text-blue-500 drop-shadow-2xl" style={{ filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3))' }} />
+              </motion.div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       {/* Enhanced Header */}
       <header className="sticky top-0 z-50 backdrop-blur-lg bg-white/80 border-b border-gray-200 shadow-sm">
         <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4">
@@ -288,6 +382,7 @@ export function ModernEcommerceWhatsapp() {
                   <Button
                     variant="outline"
                     size="icon"
+                    data-cart-icon
                     className="relative h-10 w-10 sm:h-12 sm:w-12 rounded-full border-2 hover:border-gray-900 transition-all"
                   >
                     <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -606,7 +701,7 @@ export function ModernEcommerceWhatsapp() {
                         <Button
                           onClick={(e) => {
                             e.stopPropagation();
-                            addToCart(product);
+                            addToCart(product, e.currentTarget);
                           }}
                           className="w-full bg-gradient-to-r from-gray-900 to-gray-800 hover:from-gray-800 hover:to-gray-700 text-white font-semibold h-12 shadow-lg"
                         >
@@ -721,7 +816,7 @@ export function ModernEcommerceWhatsapp() {
                         <Button
                           onClick={(e) => {
                             e.stopPropagation();
-                            addToCart(product);
+                            addToCart(product, e.currentTarget);
                           }}
                           className="w-full bg-gradient-to-r from-gray-900 to-gray-800 hover:from-gray-800 hover:to-gray-700 text-white font-semibold h-11 shadow-lg"
                         >
