@@ -18,8 +18,6 @@ const nextConfig = {
     ],
   },
   reactStrictMode: true,
-  // Output configuration for Vercel
-  output: 'standalone',
 };
 
 // Export the configuration using CommonJS syntax

@@ -1,24 +1,33 @@
-# Ignore server folder (backend will be hosted separately)
+# Ignore server folder completely (backend will be hosted separately)
 server/
-server/**/*
+server/**
+**/server/
+**/server/**
 
 # Ignore backend documentation
 BACKEND_SETUP.md
+INTEGRATION_GUIDE.md
 server/API_DOCUMENTATION.md
 server/README.md
 
 # Ignore node_modules
 node_modules/
+**/node_modules/
 
 # Ignore environment files
 .env
 .env.local
 .env*.local
+**/.env
+**/.env.local
 
 # Ignore build artifacts
 .next/
 out/
 dist/
+**/.next/
+**/out/
+**/dist/
 
 # Ignore logs
 *.log
@@ -30,3 +39,6 @@ yarn-error.log*
 .DS_Store
 Thumbs.db
 
+# Ignore TypeScript build info
+*.tsbuildinfo
+tsconfig.tsbuildinfo
