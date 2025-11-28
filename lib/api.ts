@@ -24,12 +24,20 @@ export async function fetchRelatedProducts(id: number) {
   return data.success ? data.data : [];
 }
 
+interface OrderItem {
+  id: number;
+  name: string;
+  price: number;
+  quantity: number;
+  image?: string;
+}
+
 export async function createOrder(orderData: {
   customerName: string;
   customerEmail?: string;
   address: string;
   phone?: string;
-  items: any[];
+  items: OrderItem[];
   total: number;
 }) {
   const response = await fetch(`${API_BASE_URL}/orders`, {
@@ -67,7 +75,17 @@ export async function adminLogin(email: string, password: string) {
   return data;
 }
 
-export async function createProduct(productData: any, token: string) {
+export async function createProduct(productData: Partial<{
+  name: string;
+  price: number;
+  image: string;
+  images: string[];
+  description: string;
+  category: string;
+  rating: number;
+  reviews: number;
+  inStock: boolean;
+}>, token: string) {
   const response = await fetch(`${API_BASE_URL}/products`, {
     method: 'POST',
     headers: {
@@ -80,7 +98,17 @@ export async function createProduct(productData: any, token: string) {
   return data;
 }
 
-export async function updateProduct(id: number, productData: any, token: string) {
+export async function updateProduct(id: number, productData: Partial<{
+  name: string;
+  price: number;
+  image: string;
+  images: string[];
+  description: string;
+  category: string;
+  rating: number;
+  reviews: number;
+  inStock: boolean;
+}>, token: string) {
   const response = await fetch(`${API_BASE_URL}/products/${id}`, {
     method: 'PUT',
     headers: {

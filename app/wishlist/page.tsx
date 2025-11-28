@@ -12,7 +12,6 @@ import { fetchProducts } from "@/lib/api";
 export default function WishlistPage() {
   const router = useRouter();
   const [favorites, setFavorites] = useState<number[]>([]);
-  const [cartItems, setCartItems] = useState<Product[]>([]);
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 

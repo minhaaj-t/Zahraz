@@ -33,7 +33,7 @@ export default function AdminLogin() {
         setError(result.error || "Invalid email or password");
         setLoading(false);
       }
-    } catch (err) {
+    } catch {
       setError("Connection error. Please check if the server is running.");
       setLoading(false);
     }

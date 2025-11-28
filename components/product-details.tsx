@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { type Product, allProducts } from "@/lib/products";
+import { type Product } from "@/lib/products";
 import {
   Carousel,
   CarouselContent,
